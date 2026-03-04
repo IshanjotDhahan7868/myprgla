@@ -23,6 +23,9 @@ interface PergolaProps {
 
 interface SceneProps extends PergolaProps {
   view?: CameraView;
+  autoRotate?: boolean;
+  autoRotateSpeed?: number;
+  interactive?: boolean;
 }
 
 const POST_HEIGHT = 2.5;
@@ -378,7 +381,7 @@ function OutdoorGround() {
   );
 }
 
-function SceneContents({ view = "corner", sceneMode = "studio", ...props }: SceneProps) {
+function SceneContents({ view = "corner", sceneMode = "studio", autoRotate = false, autoRotateSpeed = 0.4, interactive = true, ...props }: SceneProps) {
   const controlsRef = useRef<any>(null);
   const { camera, invalidate } = useThree();
   const isAnimating = useRef(false);
@@ -422,6 +425,11 @@ function SceneContents({ view = "corner", sceneMode = "studio", ...props }: Scen
 
   // Only lerp camera when animating; stop when converged
   useFrame(() => {
+    if (autoRotate) {
+      if (controlsRef.current) controlsRef.current.update();
+      invalidate();
+      return;
+    }
     if (!isAnimating.current) return;
 
     camera.position.lerp(targetCamera.current, 0.08);
@@ -485,7 +493,11 @@ function SceneContents({ view = "corner", sceneMode = "studio", ...props }: Scen
         minDistance={5}
         maxDistance={22}
         maxPolarAngle={Math.PI / 2.05}
-        enablePan
+        enablePan={interactive}
+        enableZoom={interactive}
+        enableRotate={interactive}
+        autoRotate={autoRotate}
+        autoRotateSpeed={autoRotateSpeed}
         target={[0, 1.4, 0]}
         onChange={() => invalidate()}
       />
@@ -499,7 +511,7 @@ export default function PergolaScene(props: SceneProps) {
   return (
     <Canvas
       shadows
-      frameloop="demand"
+      frameloop={props.autoRotate ? "always" : "demand"}
       camera={{ position: [9, 6, 9], fov: 42 }}
       style={{ width: "100%", height: "100%" }}
     >

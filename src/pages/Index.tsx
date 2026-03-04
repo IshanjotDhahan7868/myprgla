@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ChevronDown, Shield, SunDim, Droplets, Lightbulb, Palette, Wrench,
@@ -8,6 +8,8 @@ import OptimizedImage from "@/components/OptimizedImage";
 import { USE_CASE_IMAGES, PROJECT_IMAGES, IMAGES } from "@/lib/images";
 import { sendEmail } from "@/lib/emailjs";
 import { toast } from "sonner";
+
+import PergolaScene from "@/components/PergolaScene";
 
 const features = [
   { icon: Shield, title: "Aviation-Grade Aluminum", desc: "6063-T5 alloy — engineered for Ontario's -30°C winters and 35°C summers" },
@@ -111,9 +113,31 @@ export default function Index() {
 
   return (
     <div>
-      {/* HERO */}
+      {/* HERO with 3D pergola */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/90" />
+        {/* 3D Scene background */}
+        <div className="absolute inset-0">
+          <Suspense fallback={<div className="w-full h-full bg-background" />}>
+            <PergolaScene
+              color="#F0EDE8"
+              width={4}
+              depth={4}
+              louverAngle={0}
+              ledsOn={true}
+              modelType="louvered"
+              sideWall="off"
+              roofTint="clear"
+              sceneMode="studio"
+              autoRotate
+              autoRotateSpeed={0.3}
+              interactive={false}
+            />
+          </Suspense>
+        </div>
+
+        {/* Gradient overlays for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/40 to-background/90 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60 pointer-events-none" />
 
         <div className="relative z-10 text-center px-4 max-w-4xl">
           <motion.p
