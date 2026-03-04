@@ -24,17 +24,18 @@ export default function StickyCTA() {
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border py-3 px-4"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <div className="container mx-auto flex items-center justify-center gap-3 max-w-lg">
             <Link
               to="/configurator"
-              className="btn-primary-glow flex-1 px-4 py-2.5 rounded-md text-sm font-medium flex items-center justify-center gap-2"
+              className="btn-primary-glow flex-1 px-4 py-3 rounded-md text-sm font-medium flex items-center justify-center gap-2"
             >
               Build Yours <ArrowRight size={14} />
             </Link>
             <a
               href="tel:6476486383"
-              className="flex-1 px-4 py-2.5 rounded-md text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 rounded-md text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors flex items-center justify-center gap-2"
             >
               <Phone size={14} /> Call Now
             </a>

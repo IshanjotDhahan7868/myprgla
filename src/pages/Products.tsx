@@ -83,7 +83,7 @@ export default function Products() {
                   <OptimizedImage
                     src={p.image}
                     alt={`PRGLA Pergola — ${p.name}`}
-                    className="h-48 w-full"
+                    className="h-40 sm:h-48 w-full"
                   />
                   <div className="p-6">
                     <h3 className="font-heading text-2xl text-foreground mb-3">{p.name}</h3>
@@ -233,8 +233,8 @@ export default function Products() {
           </AnimatedSection>
 
           <AnimatedSection>
-            <div className="glass-card overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="glass-card overflow-x-auto">
+              <table className="w-full text-sm min-w-[400px]">
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left p-4 text-muted-foreground font-medium">Feature</th>

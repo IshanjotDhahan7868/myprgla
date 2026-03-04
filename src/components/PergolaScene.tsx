@@ -501,6 +501,7 @@ export default function PergolaScene(props: SceneProps) {
       shadows
       frameloop="demand"
       camera={{ position: [9, 6, 9], fov: 42 }}
+      style={{ width: "100%", height: "100%" }}
     >
       <Suspense fallback={<Loader />}>
         <SceneContents {...props} sceneMode={sceneMode} />

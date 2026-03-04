@@ -121,7 +121,7 @@ export default function QuotePage() {
               <button
                 type="submit"
                 disabled={sending}
-                className="btn-primary-glow w-full px-6 py-3 rounded-md text-sm font-medium disabled:opacity-50"
+                className="btn-primary-glow w-full px-6 py-3.5 rounded-md text-sm font-medium disabled:opacity-50"
               >
                 {sending ? "Sending…" : "Submit Request"}
               </button>

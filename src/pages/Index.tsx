@@ -120,7 +120,7 @@ export default function Index() {
         <div className="absolute inset-0 bg-background/70" />
 
         <div className="relative z-10 text-center px-4 max-w-4xl">
-          <h1 className="heading-display text-5xl md:text-7xl lg:text-8xl mb-6">
+          <h1 className="heading-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl mb-6">
             {headlineWords.map((word, i) => (
               <motion.span
                 key={word}
@@ -186,7 +186,7 @@ export default function Index() {
       {/* TRUST BADGES */}
       <section className="py-8 border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-16">
             {trustBadges.map((badge) => (
               <div key={badge.label} className="flex items-center gap-2 text-sm text-muted-foreground">
                 <badge.icon size={20} className="text-primary" />
@@ -306,7 +306,7 @@ export default function Index() {
                   <OptimizedImage
                     src={USE_CASE_IMAGES[i]}
                     alt={uc.title}
-                    className="h-48 w-full group-hover:scale-105 transition-transform duration-500"
+                    className="h-40 sm:h-48 w-full group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="p-6">
                     <h3 className="font-heading text-2xl mb-2 text-foreground">{uc.title}</h3>
@@ -422,7 +422,7 @@ export default function Index() {
             ) : (
               <form
                 onSubmit={handleNewsletterSubmit}
-                className="flex gap-2 max-w-md mx-auto"
+                className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto"
               >
                 <input
                   type="email"

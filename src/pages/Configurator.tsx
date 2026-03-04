@@ -214,30 +214,29 @@ export default function Configurator() {
   );
 
   const cameraButtons = (
-    <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
-      <div className="text-xs text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-md border border-border">
+    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex flex-col items-end gap-2">
+      <div className="hidden sm:block text-xs text-muted-foreground bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-md border border-border">
         Drag to rotate • Scroll to zoom
       </div>
-      <div className="bg-card/80 backdrop-blur-sm px-2 py-1.5 rounded-md border border-border flex flex-wrap gap-1 justify-end">
+      <div className="bg-card/80 backdrop-blur-sm px-1.5 py-1.5 rounded-md border border-border flex flex-wrap gap-1 justify-end">
         {(["corner", "front", "top", "under"] as CameraView[]).map((v) => (
           <button
             key={v}
             onClick={() => setCameraView(v)}
-            className={`px-2 py-1 rounded text-[11px] ${
+            className={`px-2.5 py-1.5 rounded text-xs ${
               cameraView === v
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {v === "under" ? "Under roof" : v.charAt(0).toUpperCase() + v.slice(1)}
+            {v === "under" ? "Under" : v.charAt(0).toUpperCase() + v.slice(1)}
           </button>
         ))}
         <button
           onClick={() => setCameraView("corner")}
-          className="ml-1 inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] border border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+          className="ml-1 inline-flex items-center gap-1 px-2.5 py-1.5 rounded text-xs border border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground"
         >
           <RotateCcw size={12} />
-          Reset
         </button>
       </div>
     </div>
@@ -246,34 +245,39 @@ export default function Configurator() {
   // Mobile: full-screen canvas + floating drawer
   if (isMobile) {
     return (
-      <div className="pt-16 min-h-screen flex flex-col">
-        <div className="flex-1 relative min-h-[60vh]">
-          <Suspense
-            fallback={
-              <div className="absolute inset-0 flex items-center justify-center bg-background">
-                <span className="text-muted-foreground text-sm">Loading 3D view…</span>
-              </div>
-            }
-          >
-            <PergolaScene
-              color={currentColor.value}
-              width={currentSize.width}
-              depth={currentSize.depth}
-              louverAngle={louverAngle}
-              ledsOn={ledsOn}
-              sceneMode={sceneMode}
-              modelType={modelType}
-              sideWall={sideWall}
-              roofTint={roofTint}
-              view={cameraView}
-            />
-          </Suspense>
+      <div className="fixed inset-0 pt-16 flex flex-col bg-background">
+        <div className="relative flex-1">
+          <div className="absolute inset-0">
+            <Suspense
+              fallback={
+                <div className="absolute inset-0 flex items-center justify-center bg-background">
+                  <span className="text-muted-foreground text-sm">Loading 3D view…</span>
+                </div>
+              }
+            >
+              <PergolaScene
+                color={currentColor.value}
+                width={currentSize.width}
+                depth={currentSize.depth}
+                louverAngle={louverAngle}
+                ledsOn={ledsOn}
+                sceneMode={sceneMode}
+                modelType={modelType}
+                sideWall={sideWall}
+                roofTint={roofTint}
+                view={cameraView}
+              />
+            </Suspense>
+          </div>
           {cameraButtons}
         </div>
 
         <Drawer>
           <DrawerTrigger asChild>
-            <button className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 btn-primary-glow px-6 py-3 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg">
+            <button
+              className="fixed left-1/2 -translate-x-1/2 z-30 btn-primary-glow px-6 py-3.5 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg"
+              style={{ bottom: "max(1.5rem, env(safe-area-inset-bottom, 1.5rem))" }}
+            >
               <Settings2 size={16} /> Configure
             </button>
           </DrawerTrigger>

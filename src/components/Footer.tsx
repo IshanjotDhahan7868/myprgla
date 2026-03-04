@@ -50,7 +50,7 @@ export default function Footer() {
       </div>
 
       <div className="container mx-auto px-4 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           <div className="md:col-span-2">
             <span className="font-heading text-2xl font-semibold tracking-wider text-foreground">
               PRGLA
@@ -68,14 +68,14 @@ export default function Footer() {
                   <span>Thanks for subscribing!</span>
                 </div>
               ) : (
-                <form onSubmit={handleNewsletter} className="flex gap-2 max-w-sm">
+                <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-2 max-w-sm">
                   <input
                     type="email"
                     required
                     placeholder="Your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="flex-1 bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="flex-1 bg-muted border border-border rounded-md px-3 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                   <button
                     type="submit"

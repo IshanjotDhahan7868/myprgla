@@ -80,7 +80,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-foreground p-2"
+            className="md:hidden text-foreground p-3"
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -94,7 +94,7 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-40 bg-background pt-20 px-8 md:hidden"
+            className="fixed inset-0 z-40 bg-background pt-20 px-6 sm:px-8 md:hidden"
           >
             <div className="flex flex-col gap-6">
               {links.map((l) => (
