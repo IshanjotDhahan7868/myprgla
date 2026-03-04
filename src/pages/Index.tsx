@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ChevronDown, Shield, SunDim, Droplets, Lightbulb, Palette, Wrench,
@@ -80,132 +80,151 @@ const wordVariants = {
   }),
 };
 
-function HeroParticles() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouse = useRef({ x: -1, y: -1 });
-  const animFrame = useRef(0);
+/* SVG blueprint pergola — draws wireframe then fills with gold accent */
+const drawLine = (delay: number, dur: number) => ({
+  hidden: { pathLength: 0, opacity: 0 },
+  visible: {
+    pathLength: 1,
+    opacity: 1,
+    transition: { delay, duration: dur, ease: "easeInOut" as const },
+  },
+});
 
-  const draw = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+const fillReveal = (delay: number) => ({
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { delay, duration: 0.8, ease: "easeOut" as const },
+  },
+});
 
-    const dpr = window.devicePixelRatio || 1;
-    const w = canvas.width / dpr;
-    const h = canvas.height / dpr;
+function HeroBlueprintReveal() {
+  // Isometric-ish pergola: 4 posts, top frame, louver slats
+  // Viewbox 0 0 600 400, centered
+  const postColor = "rgba(191,163,112,0.35)";
+  const fillColor = "rgba(191,163,112,0.08)";
+  const glowColor = "rgba(191,163,112,0.18)";
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Posts (bottom-left, bottom-right, top-left, top-right in pseudo-3D)
+  const posts = [
+    { x1: 140, y1: 340, x2: 140, y2: 180 },  // front-left
+    { x1: 460, y1: 340, x2: 460, y2: 180 },  // front-right
+    { x1: 220, y1: 280, x2: 220, y2: 120 },  // back-left
+    { x1: 540, y1: 280, x2: 540, y2: 120 },  // back-right
+  ];
 
-    const cols = Math.floor(w / 50) + 1;
-    const rows = Math.floor(h / 50) + 1;
-    const spacingX = w / (cols - 1);
-    const spacingY = h / (rows - 1);
-    const time = Date.now() * 0.001;
-    const mx = mouse.current.x;
-    const my = mouse.current.y;
+  // Top frame edges
+  const frame = [
+    "M140,180 L460,180",   // front beam
+    "M220,120 L540,120",   // back beam
+    "M140,180 L220,120",   // left beam
+    "M460,180 L540,120",   // right beam
+  ];
 
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const baseX = col * spacingX;
-        const baseY = row * spacingY;
+  // Louver slats (5 slats across the roof)
+  const slats = Array.from({ length: 7 }, (_, i) => {
+    const t = (i + 1) / 8;
+    const fx = 140 + t * (460 - 140);
+    const bx = 220 + t * (540 - 220);
+    const fy = 180;
+    const by = 120;
+    return `M${fx},${fy} L${bx},${by}`;
+  });
 
-        // Gentle wave displacement
-        const offsetX = Math.sin(time * 0.4 + row * 0.3 + col * 0.2) * 3;
-        const offsetY = Math.cos(time * 0.3 + col * 0.4 + row * 0.15) * 3;
-        const x = baseX + offsetX;
-        const y = baseY + offsetY;
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <motion.svg
+        viewBox="0 0 680 460"
+        className="w-full max-w-3xl h-auto opacity-60"
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Glow filter */}
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-        // Mouse proximity glow
-        let alpha = 0.12;
-        let radius = 1.5;
-        if (mx >= 0 && my >= 0) {
-          const dist = Math.hypot(x - mx, y - my);
-          if (dist < 180) {
-            const proximity = 1 - dist / 180;
-            alpha = 0.12 + proximity * 0.5;
-            radius = 1.5 + proximity * 2.5;
-          }
-        }
+        {/* Filled roof plane (appears after wireframe) */}
+        <motion.polygon
+          points="140,180 460,180 540,120 220,120"
+          fill={fillColor}
+          variants={fillReveal(2.8)}
+        />
 
-        // Gold-tinted dots
-        ctx.beginPath();
-        ctx.arc(x * dpr, y * dpr, radius * dpr, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(191, 163, 112, ${alpha})`;
-        ctx.fill();
-      }
-    }
+        {/* Subtle ground shadow */}
+        <motion.ellipse
+          cx="340"
+          cy="355"
+          rx="180"
+          ry="18"
+          fill={fillColor}
+          variants={fillReveal(3.0)}
+        />
 
-    // Draw faint connecting lines to nearby dots near mouse
-    if (mx >= 0 && my >= 0) {
-      for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          const baseX = col * spacingX;
-          const baseY = row * spacingY;
-          const offsetX = Math.sin(time * 0.4 + row * 0.3 + col * 0.2) * 3;
-          const offsetY = Math.cos(time * 0.3 + col * 0.4 + row * 0.15) * 3;
-          const x = baseX + offsetX;
-          const y = baseY + offsetY;
-          const dist = Math.hypot(x - mx, y - my);
-          if (dist > 120) continue;
+        {/* Posts draw first */}
+        {posts.map((p, i) => (
+          <motion.line
+            key={`post-${i}`}
+            x1={p.x1} y1={p.y1} x2={p.x2} y2={p.y2}
+            stroke={postColor}
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            fill="none"
+            filter="url(#glow)"
+            variants={drawLine(0.2 + i * 0.15, 0.6)}
+          />
+        ))}
 
-          // Connect to right and bottom neighbors
-          for (const [dc, dr] of [[1, 0], [0, 1], [1, 1]]) {
-            const nc = col + dc;
-            const nr = row + dr;
-            if (nc >= cols || nr >= rows) continue;
-            const nx = nc * spacingX + Math.sin(time * 0.4 + nr * 0.3 + nc * 0.2) * 3;
-            const ny = nr * spacingY + Math.cos(time * 0.3 + nc * 0.4 + nr * 0.15) * 3;
-            const ndist = Math.hypot(nx - mx, ny - my);
-            if (ndist > 120) continue;
+        {/* Frame beams */}
+        {frame.map((d, i) => (
+          <motion.path
+            key={`frame-${i}`}
+            d={d}
+            stroke={postColor}
+            strokeWidth={2}
+            strokeLinecap="round"
+            fill="none"
+            filter="url(#glow)"
+            variants={drawLine(1.0 + i * 0.2, 0.5)}
+          />
+        ))}
 
-            const lineAlpha = (1 - Math.max(dist, ndist) / 120) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(x * dpr, y * dpr);
-            ctx.lineTo(nx * dpr, ny * dpr);
-            ctx.strokeStyle = `rgba(191, 163, 112, ${lineAlpha})`;
-            ctx.lineWidth = dpr;
-            ctx.stroke();
-          }
-        }
-      }
-    }
+        {/* Louver slats */}
+        {slats.map((d, i) => (
+          <motion.path
+            key={`slat-${i}`}
+            d={d}
+            stroke={glowColor}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            fill="none"
+            variants={drawLine(2.0 + i * 0.08, 0.35)}
+          />
+        ))}
 
-    animFrame.current = requestAnimationFrame(draw);
-  }, []);
+        {/* Dimension lines (architectural detail) */}
+        <motion.g variants={fillReveal(3.2)}>
+          {/* Width dimension below */}
+          <line x1={140} y1={365} x2={460} y2={365} stroke="rgba(191,163,112,0.15)" strokeWidth={0.8} strokeDasharray="4 4" />
+          <line x1={140} y1={358} x2={140} y2={372} stroke="rgba(191,163,112,0.15)" strokeWidth={0.8} />
+          <line x1={460} y1={358} x2={460} y2={372} stroke="rgba(191,163,112,0.15)" strokeWidth={0.8} />
+          <text x={300} y={380} fill="rgba(191,163,112,0.2)" fontSize={11} fontFamily="monospace" textAnchor="middle">4000mm</text>
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = canvas.offsetWidth * dpr;
-      canvas.height = canvas.offsetHeight * dpr;
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-    animFrame.current = requestAnimationFrame(draw);
-
-    const handleMouse = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    };
-    const handleLeave = () => { mouse.current = { x: -1, y: -1 }; };
-
-    canvas.addEventListener("mousemove", handleMouse);
-    canvas.addEventListener("mouseleave", handleLeave);
-
-    return () => {
-      cancelAnimationFrame(animFrame.current);
-      window.removeEventListener("resize", resize);
-      canvas.removeEventListener("mousemove", handleMouse);
-      canvas.removeEventListener("mouseleave", handleLeave);
-    };
-  }, [draw]);
-
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
+          {/* Height dimension side */}
+          <line x1={115} y1={180} x2={115} y2={340} stroke="rgba(191,163,112,0.15)" strokeWidth={0.8} strokeDasharray="4 4" />
+          <line x1={108} y1={180} x2={122} y2={180} stroke="rgba(191,163,112,0.15)" strokeWidth={0.8} />
+          <line x1={108} y1={340} x2={122} y2={340} stroke="rgba(191,163,112,0.15)" strokeWidth={0.8} />
+          <text x={100} y={265} fill="rgba(191,163,112,0.2)" fontSize={11} fontFamily="monospace" textAnchor="middle" transform="rotate(-90, 100, 265)">2500mm</text>
+        </motion.g>
+      </motion.svg>
+    </div>
+  );
 }
 
 export default function Index() {
@@ -239,9 +258,9 @@ export default function Index() {
 
   return (
     <div>
-      {/* HERO with particle grid */}
+      {/* HERO with blueprint reveal */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <HeroParticles />
+        <HeroBlueprintReveal />
 
         <div className="relative z-10 text-center px-4 max-w-4xl">
           <motion.p
