@@ -42,7 +42,7 @@ export default function Configurator() {
   const initialModel = (searchParams.get("model") as ModelType) ?? "louvered";
   const initialScene =
     (searchParams.get("scene") as SceneMode) === "outdoor" ? "outdoor" : "studio";
-  const initialLouverAngle = Number(searchParams.get("louverAngle") ?? "30");
+  const initialLouversOpen = searchParams.get("louvers") !== "closed";
   const initialLedsOn = searchParams.get("led") === "on";
   const initialSideWall =
     (searchParams.get("sideWall") as SideWallOption) ?? "off";
@@ -51,7 +51,7 @@ export default function Configurator() {
   const [colorIdx, setColorIdx] = useState(safeInitialColorIndex);
   const [sizeIdx, setSizeIdx] = useState(safeInitialSizeIndex);
   const [modelType, setModelType] = useState<ModelType>(initialModel);
-  const [louverAngle, setLouverAngle] = useState(initialLouverAngle);
+  const [louversOpen, setLouversOpen] = useState(initialLouversOpen);
   const [ledsOn, setLedsOn] = useState(initialLedsOn);
   const [sceneMode, setSceneMode] = useState<SceneMode>(initialScene);
   const [sideWall, setSideWall] = useState<SideWallOption>(initialSideWall);
@@ -74,11 +74,9 @@ export default function Configurator() {
 
   const configSummary = `${currentColor.label}, ${currentSize.label}, ${
     modelType === "louvered"
-      ? `Louver ${louverAngle}°`
+      ? `Louvers ${louversOpen ? "Open" : "Closed"}`
       : `SkyVue (${roofTint === "clear" ? "Clear" : "Smoke"})`
-  }, LEDs ${ledsOn ? "On" : "Off"}, Scene ${
-    sceneMode === "studio" ? "Studio" : "Outdoor"
-  }, Side Wall ${
+  }, LEDs ${ledsOn ? "On" : "Off"}, Side Wall ${
     sideWall === "off" ? "None" : sideWall.charAt(0).toUpperCase() + sideWall.slice(1)
   }`;
 
@@ -112,7 +110,7 @@ export default function Configurator() {
     params.set("size", currentSize.key);
     params.set("color", currentColor.key);
     if (modelType === "louvered") {
-      params.set("louverAngle", String(louverAngle));
+      params.set("louvers", louversOpen ? "open" : "closed");
     }
     params.set("led", ledsOn ? "on" : "off");
     params.set("scene", sceneMode);
@@ -134,7 +132,7 @@ export default function Configurator() {
     colorIdx, setColorIdx,
     sizeIdx, setSizeIdx,
     modelType, setModelType,
-    louverAngle, setLouverAngle,
+    louversOpen, setLouversOpen,
     ledsOn, setLedsOn: (v: boolean) => setLedsOn(v),
     roofTint, setRoofTint,
     sideWall, setSideWall,
@@ -162,8 +160,8 @@ export default function Configurator() {
         </div>
         {modelType === "louvered" && (
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Louver</span>
-            <span className="text-foreground">{louverAngle}°</span>
+            <span className="text-muted-foreground">Louvers</span>
+            <span className="text-foreground">{louversOpen ? "Open" : "Closed"}</span>
           </div>
         )}
         <div className="flex justify-between">
@@ -259,7 +257,7 @@ export default function Configurator() {
                 color={currentColor.value}
                 width={currentSize.width}
                 depth={currentSize.depth}
-                louverAngle={louverAngle}
+                louverAngle={louversOpen ? 45 : 0}
                 ledsOn={ledsOn}
                 sceneMode={sceneMode}
                 modelType={modelType}
@@ -334,7 +332,7 @@ export default function Configurator() {
             color={currentColor.value}
             width={currentSize.width}
             depth={currentSize.depth}
-            louverAngle={louverAngle}
+            louverAngle={louversOpen ? 45 : 0}
             ledsOn={ledsOn}
             sceneMode={sceneMode}
             modelType={modelType}

@@ -10,12 +10,12 @@ import { sendEmail } from "@/lib/emailjs";
 import { toast } from "sonner";
 
 const features = [
-  { icon: Shield, title: "Aviation-Grade Aluminum", desc: "6063-T5 alloy for maximum strength & longevity" },
-  { icon: SunDim, title: "Louvered Roof", desc: "Button-controlled louvers for sun & rain" },
-  { icon: Lightbulb, title: "Built-in LEDs", desc: "Weatherproof integrated LED lighting" },
-  { icon: Droplets, title: "Self-Drainage", desc: "Engineered internal water channel system" },
-  { icon: Palette, title: "Powder-Coated", desc: "Durable finish in White or Anthracite" },
-  { icon: Wrench, title: "SS 304 Hardware", desc: "Stainless steel fasteners throughout" },
+  { icon: Shield, title: "Aviation-Grade Aluminum", desc: "6063-T5 alloy — engineered for Ontario's -30°C winters and 35°C summers" },
+  { icon: SunDim, title: "Motorized Louvers", desc: "Open for sun, close for rain — one button controls your comfort" },
+  { icon: Lightbulb, title: "Built-in LEDs", desc: "Weatherproof ambient lighting for evenings that never end" },
+  { icon: Droplets, title: "Self-Drainage", desc: "Engineered internal channel system — zero pooling, zero maintenance" },
+  { icon: Palette, title: "Powder-Coated", desc: "Durable finish in Greece White or Anthracite Grey" },
+  { icon: Wrench, title: "SS 304 Hardware", desc: "Stainless steel fasteners throughout — nothing rusts, ever" },
 ];
 
 const sizes = [
@@ -26,9 +26,9 @@ const sizes = [
 ];
 
 const useCases = [
-  { title: "Attach to a Wall", desc: "Seamless extension of your indoor living space with a wall-mounted pergola." },
-  { title: "Cover Your Hot Tub", desc: "Year-round protection for your hot tub or swim spa with adjustable shade." },
-  { title: "Outdoor Dining Area", desc: "Create the perfect BBQ and dining space with weather-controlled coverage." },
+  { title: "Extend Your Home", desc: "A wall-mounted PRGLA adds 100–250 sq ft of living space — for a fraction of a home addition." },
+  { title: "Hot Tub All Year", desc: "Rain, snow, or sun — your hot tub is always ready. No more dragging covers." },
+  { title: "Host Like You Mean It", desc: "The backyard dinner party that runs until midnight, rain or shine. That's a PRGLA." },
 ];
 
 const projects = [
@@ -43,33 +43,33 @@ const projects = [
 const partners = ["CH Design Co.", "Ruby Concrete", "Vaughan Electric", "Altru Design Studio"];
 
 const trustBadges = [
-  { icon: Award, label: "5-Year Warranty" },
-  { icon: Wrench, label: "Professional Installation" },
-  { icon: MapPin, label: "Canadian Made" },
+  { icon: Award, label: "5-Year Structural Warranty" },
+  { icon: Wrench, label: "Installed in 1–2 Days" },
+  { icon: MapPin, label: "Proudly Canadian" },
 ];
 
 const testimonials = [
   {
-    quote: "The PRGLA pergola completely transformed our backyard. We use the patio year-round now.",
+    quote: "We went from never using our backyard to hosting dinner out there every weekend. Our neighbours keep asking who built it.",
     name: "Sarah & Mike T.",
     location: "Oakville, ON",
   },
   {
-    quote: "Professional install, incredible quality. The LED lighting at night is absolutely stunning.",
+    quote: "Installed in 2 days, looks like it cost double what we paid. The LED lighting at night turns our patio into a resort.",
     name: "David R.",
     location: "Vaughan, ON",
   },
   {
-    quote: "Best investment we've made for our outdoor space. The louver control is a game changer in summer.",
+    quote: "We used our pergola through the entire fall and winter. Best money we've ever spent on our home — and that includes the kitchen reno.",
     name: "Jennifer L.",
     location: "Caledon, ON",
   },
 ];
 
 const howItWorks = [
-  { step: "1", title: "Configure", desc: "Use our 3D configurator to customize your perfect pergola." },
-  { step: "2", title: "Quote", desc: "Receive a detailed quote with pricing and installation timeline." },
-  { step: "3", title: "Install", desc: "Our professional team installs your pergola in 1–2 days." },
+  { step: "1", title: "Design It", desc: "Build your dream pergola in our 3D configurator. See exactly what it looks like before we build it." },
+  { step: "2", title: "We Quote It", desc: "Get a detailed quote within 48 hours. No surprises, no hidden fees." },
+  { step: "3", title: "We Install It", desc: "Our crew installs in 1–2 days. You just show up to enjoy it." },
 ];
 
 const wordVariants = {
@@ -81,7 +81,7 @@ const wordVariants = {
 };
 
 export default function Index() {
-  const headlineWords = ["Redefine", "Your", "Outdoor", "Living"];
+  const headlineWords = ["Stop", "Wasting", "Your", "Backyard"];
 
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSending, setNewsletterSending] = useState(false);
@@ -113,13 +113,18 @@ export default function Index() {
     <div>
       {/* HERO */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${IMAGES.hero})` }}
-        />
-        <div className="absolute inset-0 bg-background/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/90" />
 
         <div className="relative z-10 text-center px-4 max-w-4xl">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="text-primary text-sm font-medium tracking-wider uppercase mb-6"
+          >
+            GTA's Premier Luxury Pergola
+          </motion.p>
+
           <h1 className="heading-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl mb-6">
             {headlineWords.map((word, i) => (
               <motion.span
@@ -129,7 +134,7 @@ export default function Index() {
                 animate="visible"
                 variants={wordVariants}
                 className={`inline-block mr-3 md:mr-5 ${
-                  i === 2 || i === 3 ? "text-gold-gradient" : ""
+                  i >= 2 ? "text-gold-gradient" : ""
                 }`}
               >
                 {word}
@@ -141,10 +146,19 @@ export default function Index() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.6 }}
-            className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10 font-light"
+            className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-4 font-light"
           >
-            Aviation-grade aluminum pergolas with smart louvered roofs, LED
-            lighting, and Canadian craftsmanship.
+            Motorized aluminum pergolas that turn your backyard into a year-round
+            living space. Engineered for Canadian weather. Installed in days, not months.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.15, duration: 0.5 }}
+            className="text-muted-foreground/70 text-sm max-w-lg mx-auto mb-10"
+          >
+            From $199/month • 5-Year Warranty • Full-Service Installation
           </motion.p>
 
           <motion.div
@@ -155,16 +169,16 @@ export default function Index() {
           >
             <Link
               to="/configurator"
-              className="btn-primary-glow px-8 py-3 rounded-md text-sm font-medium flex items-center justify-center gap-2"
+              className="btn-primary-glow px-8 py-3.5 rounded-md text-sm font-medium flex items-center justify-center gap-2"
             >
-              Configure Yours <ArrowRight size={16} />
+              Design Yours in 3D <ArrowRight size={16} />
             </Link>
-            <a
-              href="#features"
-              className="px-8 py-3 rounded-md text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors text-center"
+            <Link
+              to="/quote"
+              className="px-8 py-3.5 rounded-md text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors text-center"
             >
-              View Products
-            </a>
+              Get a Free Quote
+            </Link>
           </motion.div>
         </div>
 
@@ -201,8 +215,8 @@ export default function Index() {
       <section id="features" className="py-24 border-b border-border">
         <div className="container mx-auto px-4">
           <AnimatedSection className="text-center mb-16">
-            <h2 className="heading-display text-4xl md:text-5xl mb-4">Engineered Excellence</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">Every detail is designed for durability, beauty, and performance.</p>
+            <h2 className="heading-display text-4xl md:text-5xl mb-4">Built to Outlast Everything</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">Every component is designed for Canadian weather, zero maintenance, and decades of use.</p>
           </AnimatedSection>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -225,16 +239,17 @@ export default function Index() {
         <div className="relative z-10 container mx-auto px-4 text-center">
           <AnimatedSection>
             <h2 className="heading-display text-4xl md:text-5xl mb-4">
-              See It Before You Build It
+              See Exactly What Yours Will Look Like
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto mb-10">
-              Customize your pergola in real time — choose size, color, and louver angle in our interactive 3D configurator.
+              Pick your size, color, and features in our interactive 3D configurator.
+              No guessing. No surprises. Design it yourself in under 2 minutes.
             </p>
             <Link
               to="/configurator"
               className="btn-primary-glow inline-flex items-center gap-2 px-10 py-4 rounded-md text-base font-medium"
             >
-              Launch Configurator <ArrowRight size={18} />
+              Build Yours Now <ArrowRight size={18} />
             </Link>
           </AnimatedSection>
         </div>
@@ -244,8 +259,8 @@ export default function Index() {
       <section className="py-24 border-b border-border">
         <div className="container mx-auto px-4">
           <AnimatedSection className="text-center mb-16">
-            <h2 className="heading-display text-4xl md:text-5xl mb-4">How It Works</h2>
-            <p className="text-muted-foreground">Three simple steps to your dream outdoor space.</p>
+            <h2 className="heading-display text-4xl md:text-5xl mb-4">From Bare Backyard to Backyard Resort</h2>
+            <p className="text-muted-foreground">We handle everything. You just show up to enjoy it.</p>
           </AnimatedSection>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
@@ -296,7 +311,7 @@ export default function Index() {
       <section className="py-24 border-b border-border">
         <div className="container mx-auto px-4">
           <AnimatedSection className="text-center mb-16">
-            <h2 className="heading-display text-4xl md:text-5xl mb-4">Perfect For Every Space</h2>
+            <h2 className="heading-display text-4xl md:text-5xl mb-4">Your Neighbours Will Ask Who Built It</h2>
           </AnimatedSection>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -359,7 +374,7 @@ export default function Index() {
       <section className="py-24 border-b border-border">
         <div className="container mx-auto px-4">
           <AnimatedSection className="text-center mb-16">
-            <h2 className="heading-display text-4xl md:text-5xl mb-4">What Our Clients Say</h2>
+            <h2 className="heading-display text-4xl md:text-5xl mb-4">Don't Take Our Word For It</h2>
           </AnimatedSection>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">

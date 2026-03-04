@@ -1,4 +1,4 @@
-import { Sun, SunDim } from "lucide-react";
+import { Sun, SunDim, CloudRain, SunMedium } from "lucide-react";
 import type {
   ModelType,
   RoofTint,
@@ -12,8 +12,8 @@ interface ConfiguratorControlsProps {
   setSizeIdx: (i: number) => void;
   modelType: ModelType;
   setModelType: (m: ModelType) => void;
-  louverAngle: number;
-  setLouverAngle: (a: number) => void;
+  louversOpen: boolean;
+  setLouversOpen: (open: boolean) => void;
   ledsOn: boolean;
   setLedsOn: (v: boolean) => void;
   roofTint: RoofTint;
@@ -33,8 +33,8 @@ export default function ConfiguratorControls({
   setSizeIdx,
   modelType,
   setModelType,
-  louverAngle,
-  setLouverAngle,
+  louversOpen,
+  setLouversOpen,
   ledsOn,
   setLedsOn,
   roofTint,
@@ -56,7 +56,7 @@ export default function ConfiguratorControls({
             <button
               key={c.key}
               onClick={() => setColorIdx(i)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition-all ${
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-md border text-sm transition-all ${
                 colorIdx === i
                   ? "border-primary bg-muted text-foreground"
                   : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -80,7 +80,7 @@ export default function ConfiguratorControls({
             <button
               key={s.key}
               onClick={() => setSizeIdx(i)}
-              className={`px-3 py-2 rounded-md border text-sm transition-all ${
+              className={`px-3 py-2.5 rounded-md border text-sm transition-all ${
                 sizeIdx === i
                   ? "border-primary bg-muted text-foreground"
                   : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -98,7 +98,7 @@ export default function ConfiguratorControls({
         <div className="grid grid-cols-1 gap-2">
           <button
             onClick={() => setModelType("louvered")}
-            className={`px-3 py-2 rounded-md border text-sm text-left transition-all ${
+            className={`px-3 py-2.5 rounded-md border text-sm text-left transition-all ${
               modelType === "louvered"
                 ? "border-primary bg-muted text-foreground"
                 : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -106,12 +106,12 @@ export default function ConfiguratorControls({
           >
             PRGLA Louvered
             <span className="block text-[11px] text-muted-foreground mt-0.5">
-              Adjustable aluminum louvers with angle control
+              Motorized aluminum louvers — open for sun, close for rain
             </span>
           </button>
           <button
             onClick={() => setModelType("skyvue")}
-            className={`px-3 py-2 rounded-md border text-sm text-left transition-all ${
+            className={`px-3 py-2.5 rounded-md border text-sm text-left transition-all ${
               modelType === "skyvue"
                 ? "border-primary bg-muted text-foreground"
                 : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -125,24 +125,39 @@ export default function ConfiguratorControls({
         </div>
       </div>
 
-      {/* Louver Angle */}
+      {/* Louver Open/Close Toggle (louvered model only) */}
       {modelType === "louvered" && (
         <div>
           <label className="text-xs uppercase tracking-wider text-muted-foreground mb-3 block">
-            Louver Angle — {louverAngle}°
+            Louvers
           </label>
-          <input
-            type="range"
-            min={0}
-            max={90}
-            value={louverAngle}
-            onChange={(e) => setLouverAngle(Number(e.target.value))}
-            className="w-full accent-primary"
-          />
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>Closed</span>
-            <span>Open</span>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setLouversOpen(true)}
+              className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-md border text-sm transition-all ${
+                louversOpen
+                  ? "border-primary bg-muted text-foreground"
+                  : "border-border text-muted-foreground hover:border-muted-foreground"
+              }`}
+            >
+              <SunMedium size={15} />
+              Open
+            </button>
+            <button
+              onClick={() => setLouversOpen(false)}
+              className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-md border text-sm transition-all ${
+                !louversOpen
+                  ? "border-primary bg-muted text-foreground"
+                  : "border-border text-muted-foreground hover:border-muted-foreground"
+              }`}
+            >
+              <CloudRain size={15} />
+              Closed
+            </button>
           </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Open lets sunlight through. Closed blocks sun and rain.
+          </p>
         </div>
       )}
 
@@ -169,7 +184,7 @@ export default function ConfiguratorControls({
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setRoofTint("clear")}
-              className={`px-3 py-2 rounded-md border text-sm transition-all ${
+              className={`px-3 py-2.5 rounded-md border text-sm transition-all ${
                 roofTint === "clear"
                   ? "border-primary bg-muted text-foreground"
                   : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -179,7 +194,7 @@ export default function ConfiguratorControls({
             </button>
             <button
               onClick={() => setRoofTint("smoke")}
-              className={`px-3 py-2 rounded-md border text-sm transition-all ${
+              className={`px-3 py-2.5 rounded-md border text-sm transition-all ${
                 roofTint === "smoke"
                   ? "border-primary bg-muted text-foreground"
                   : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -204,7 +219,7 @@ export default function ConfiguratorControls({
             <button
               key={opt.value}
               onClick={() => setSideWall(opt.value)}
-              className={`px-3 py-2 rounded-md border text-sm transition-all ${
+              className={`px-3 py-2.5 rounded-md border text-sm transition-all ${
                 sideWall === opt.value
                   ? "border-primary bg-muted text-foreground"
                   : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -225,7 +240,7 @@ export default function ConfiguratorControls({
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => setSceneMode("studio")}
-            className={`px-3 py-2 rounded-md border text-sm transition-all ${
+            className={`px-3 py-2.5 rounded-md border text-sm transition-all ${
               sceneMode === "studio"
                 ? "border-primary bg-muted text-foreground"
                 : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -235,7 +250,7 @@ export default function ConfiguratorControls({
           </button>
           <button
             onClick={() => setSceneMode("outdoor")}
-            className={`px-3 py-2 rounded-md border text-sm transition-all ${
+            className={`px-3 py-2.5 rounded-md border text-sm transition-all ${
               sceneMode === "outdoor"
                 ? "border-primary bg-muted text-foreground"
                 : "border-border text-muted-foreground hover:border-muted-foreground"
@@ -244,9 +259,6 @@ export default function ConfiguratorControls({
             Outdoor / Live
           </button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">
-          Studio is a premium dark showroom; Outdoor adds sky, sun and a brighter terrace.
-        </p>
       </div>
     </div>
   );

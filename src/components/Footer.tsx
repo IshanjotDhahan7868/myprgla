@@ -28,9 +28,9 @@ export default function Footer() {
       {/* Free Consultation CTA */}
       <div className="border-b border-border">
         <div className="container mx-auto px-4 lg:px-8 py-12 text-center">
-          <h3 className="font-heading text-2xl md:text-3xl mb-3 text-foreground">Ready to Transform Your Outdoor Space?</h3>
+          <h3 className="font-heading text-2xl md:text-3xl mb-3 text-foreground">Your Backyard Is Waiting</h3>
           <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-            Get a free consultation and custom quote for your pergola project.
+            Free design consultation. Quote in 48 hours. Installed in days. What are you waiting for?
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link

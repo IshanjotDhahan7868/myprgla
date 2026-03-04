@@ -74,7 +74,7 @@ export default function Navbar() {
               to="/quote"
               className="btn-primary-glow px-4 py-2 rounded-md text-sm font-medium"
             >
-              Free Quote
+              Get My Quote
             </Link>
           </div>
 
