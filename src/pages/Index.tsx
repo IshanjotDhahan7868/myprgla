@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ChevronDown, Shield, SunDim, Droplets, Lightbulb, Palette, Wrench,
@@ -8,8 +8,6 @@ import OptimizedImage from "@/components/OptimizedImage";
 import { USE_CASE_IMAGES, PROJECT_IMAGES, IMAGES } from "@/lib/images";
 import { sendEmail } from "@/lib/emailjs";
 import { toast } from "sonner";
-
-import PergolaScene from "@/components/PergolaScene";
 
 const features = [
   { icon: Shield, title: "Aviation-Grade Aluminum", desc: "6063-T5 alloy — engineered for Ontario's -30°C winters and 35°C summers" },
@@ -82,6 +80,134 @@ const wordVariants = {
   }),
 };
 
+function HeroParticles() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouse = useRef({ x: -1, y: -1 });
+  const animFrame = useRef(0);
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const cols = Math.floor(w / 50) + 1;
+    const rows = Math.floor(h / 50) + 1;
+    const spacingX = w / (cols - 1);
+    const spacingY = h / (rows - 1);
+    const time = Date.now() * 0.001;
+    const mx = mouse.current.x;
+    const my = mouse.current.y;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const baseX = col * spacingX;
+        const baseY = row * spacingY;
+
+        // Gentle wave displacement
+        const offsetX = Math.sin(time * 0.4 + row * 0.3 + col * 0.2) * 3;
+        const offsetY = Math.cos(time * 0.3 + col * 0.4 + row * 0.15) * 3;
+        const x = baseX + offsetX;
+        const y = baseY + offsetY;
+
+        // Mouse proximity glow
+        let alpha = 0.12;
+        let radius = 1.5;
+        if (mx >= 0 && my >= 0) {
+          const dist = Math.hypot(x - mx, y - my);
+          if (dist < 180) {
+            const proximity = 1 - dist / 180;
+            alpha = 0.12 + proximity * 0.5;
+            radius = 1.5 + proximity * 2.5;
+          }
+        }
+
+        // Gold-tinted dots
+        ctx.beginPath();
+        ctx.arc(x * dpr, y * dpr, radius * dpr, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(191, 163, 112, ${alpha})`;
+        ctx.fill();
+      }
+    }
+
+    // Draw faint connecting lines to nearby dots near mouse
+    if (mx >= 0 && my >= 0) {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const baseX = col * spacingX;
+          const baseY = row * spacingY;
+          const offsetX = Math.sin(time * 0.4 + row * 0.3 + col * 0.2) * 3;
+          const offsetY = Math.cos(time * 0.3 + col * 0.4 + row * 0.15) * 3;
+          const x = baseX + offsetX;
+          const y = baseY + offsetY;
+          const dist = Math.hypot(x - mx, y - my);
+          if (dist > 120) continue;
+
+          // Connect to right and bottom neighbors
+          for (const [dc, dr] of [[1, 0], [0, 1], [1, 1]]) {
+            const nc = col + dc;
+            const nr = row + dr;
+            if (nc >= cols || nr >= rows) continue;
+            const nx = nc * spacingX + Math.sin(time * 0.4 + nr * 0.3 + nc * 0.2) * 3;
+            const ny = nr * spacingY + Math.cos(time * 0.3 + nc * 0.4 + nr * 0.15) * 3;
+            const ndist = Math.hypot(nx - mx, ny - my);
+            if (ndist > 120) continue;
+
+            const lineAlpha = (1 - Math.max(dist, ndist) / 120) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(x * dpr, y * dpr);
+            ctx.lineTo(nx * dpr, ny * dpr);
+            ctx.strokeStyle = `rgba(191, 163, 112, ${lineAlpha})`;
+            ctx.lineWidth = dpr;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    animFrame.current = requestAnimationFrame(draw);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+    animFrame.current = requestAnimationFrame(draw);
+
+    const handleMouse = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    };
+    const handleLeave = () => { mouse.current = { x: -1, y: -1 }; };
+
+    canvas.addEventListener("mousemove", handleMouse);
+    canvas.addEventListener("mouseleave", handleLeave);
+
+    return () => {
+      cancelAnimationFrame(animFrame.current);
+      window.removeEventListener("resize", resize);
+      canvas.removeEventListener("mousemove", handleMouse);
+      canvas.removeEventListener("mouseleave", handleLeave);
+    };
+  }, [draw]);
+
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
+}
+
 export default function Index() {
   const headlineWords = ["Stop", "Wasting", "Your", "Backyard"];
 
@@ -113,31 +239,9 @@ export default function Index() {
 
   return (
     <div>
-      {/* HERO with 3D pergola */}
+      {/* HERO with particle grid */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* 3D Scene background */}
-        <div className="absolute inset-0">
-          <Suspense fallback={<div className="w-full h-full bg-background" />}>
-            <PergolaScene
-              color="#F0EDE8"
-              width={4}
-              depth={4}
-              louverAngle={0}
-              ledsOn={true}
-              modelType="louvered"
-              sideWall="off"
-              roofTint="clear"
-              sceneMode="studio"
-              autoRotate
-              autoRotateSpeed={0.3}
-              interactive={false}
-            />
-          </Suspense>
-        </div>
-
-        {/* Gradient overlays for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/40 to-background/90 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60 pointer-events-none" />
+        <HeroParticles />
 
         <div className="relative z-10 text-center px-4 max-w-4xl">
           <motion.p
