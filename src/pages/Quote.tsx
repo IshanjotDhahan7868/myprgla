@@ -1,17 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
+import { sendEmail } from "@/lib/emailjs";
+import { toast } from "sonner";
 
 export default function QuotePage() {
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
   const [form, setForm] = useState({
     name: "", email: "", phone: "", size: "3x3", color: "white", notes: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    document.title = "Get a Quote — PRGLA Pergolas";
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSending(true);
+    try {
+      await sendEmail("quote", {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        size: form.size,
+        color: form.color,
+        notes: form.notes,
+      });
+      setSubmitted(true);
+    } catch {
+      toast.error("Something went wrong. Please try again or call us directly.");
+    } finally {
+      setSending(false);
+    }
   };
 
   if (submitted) {
@@ -98,9 +120,10 @@ export default function QuotePage() {
 
               <button
                 type="submit"
-                className="btn-primary-glow w-full px-6 py-3 rounded-md text-sm font-medium"
+                disabled={sending}
+                className="btn-primary-glow w-full px-6 py-3 rounded-md text-sm font-medium disabled:opacity-50"
               >
-                Submit Request
+                {sending ? "Sending…" : "Submit Request"}
               </button>
             </form>
           </AnimatedSection>

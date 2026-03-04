@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedSection from "@/components/AnimatedSection";
 
@@ -15,6 +15,10 @@ const faqs = [
 
 export default function FAQs() {
   const [open, setOpen] = useState<number | null>(null);
+
+  useEffect(() => {
+    document.title = "FAQ — PRGLA Pergolas";
+  }, []);
 
   return (
     <div className="pt-20">

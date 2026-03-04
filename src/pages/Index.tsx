@@ -1,9 +1,13 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ChevronDown, Shield, SunDim, Droplets, Lightbulb, Palette, Wrench,
-  ArrowRight, Quote, Phone, Mail, MapPin, Facebook, Instagram } from "lucide-react";
+  ArrowRight, Phone, Mail, Star, Award, MapPin, CheckCircle } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
-import heroBg from "@/assets/hero-pergola.jpg";
+import OptimizedImage from "@/components/OptimizedImage";
+import { USE_CASE_IMAGES, PROJECT_IMAGES, IMAGES } from "@/lib/images";
+import { sendEmail } from "@/lib/emailjs";
+import { toast } from "sonner";
 
 const features = [
   { icon: Shield, title: "Aviation-Grade Aluminum", desc: "6063-T5 alloy for maximum strength & longevity" },
@@ -38,6 +42,36 @@ const projects = [
 
 const partners = ["CH Design Co.", "Ruby Concrete", "Vaughan Electric", "Altru Design Studio"];
 
+const trustBadges = [
+  { icon: Award, label: "5-Year Warranty" },
+  { icon: Wrench, label: "Professional Installation" },
+  { icon: MapPin, label: "Canadian Made" },
+];
+
+const testimonials = [
+  {
+    quote: "The PRGLA pergola completely transformed our backyard. We use the patio year-round now.",
+    name: "Sarah & Mike T.",
+    location: "Oakville, ON",
+  },
+  {
+    quote: "Professional install, incredible quality. The LED lighting at night is absolutely stunning.",
+    name: "David R.",
+    location: "Vaughan, ON",
+  },
+  {
+    quote: "Best investment we've made for our outdoor space. The louver control is a game changer in summer.",
+    name: "Jennifer L.",
+    location: "Caledon, ON",
+  },
+];
+
+const howItWorks = [
+  { step: "1", title: "Configure", desc: "Use our 3D configurator to customize your perfect pergola." },
+  { step: "2", title: "Quote", desc: "Receive a detailed quote with pricing and installation timeline." },
+  { step: "3", title: "Install", desc: "Our professional team installs your pergola in 1–2 days." },
+];
+
 const wordVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
@@ -49,13 +83,39 @@ const wordVariants = {
 export default function Index() {
   const headlineWords = ["Redefine", "Your", "Outdoor", "Living"];
 
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterSending, setNewsletterSending] = useState(false);
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+
+  useEffect(() => {
+    document.title = "PRGLA — Premium Aluminum Pergolas | Toronto & GTA";
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) {
+      meta.setAttribute("content", "Aviation-grade aluminum pergolas with smart louvered roofs, LED lighting, and Canadian craftsmanship. Serving the Greater Toronto Area.");
+    }
+  }, []);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+    setNewsletterSending(true);
+    try {
+      await sendEmail("newsletter", { email: newsletterEmail });
+      setNewsletterSubscribed(true);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setNewsletterSending(false);
+    }
+  };
+
   return (
     <div>
       {/* HERO */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroBg})` }}
+          style={{ backgroundImage: `url(${IMAGES.heroAlt})` }}
         />
         <div className="absolute inset-0 bg-background/70" />
 
@@ -123,6 +183,20 @@ export default function Index() {
         </motion.div>
       </section>
 
+      {/* TRUST BADGES */}
+      <section className="py-8 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+            {trustBadges.map((badge) => (
+              <div key={badge.label} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <badge.icon size={20} className="text-primary" />
+                <span className="font-medium">{badge.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FEATURES */}
       <section id="features" className="py-24 border-b border-border">
         <div className="container mx-auto px-4">
@@ -166,6 +240,30 @@ export default function Index() {
         </div>
       </section>
 
+      {/* HOW IT WORKS */}
+      <section className="py-24 border-b border-border">
+        <div className="container mx-auto px-4">
+          <AnimatedSection className="text-center mb-16">
+            <h2 className="heading-display text-4xl md:text-5xl mb-4">How It Works</h2>
+            <p className="text-muted-foreground">Three simple steps to your dream outdoor space.</p>
+          </AnimatedSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+            {howItWorks.map((item, i) => (
+              <AnimatedSection key={item.title} delay={i * 0.15}>
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                    <span className="text-primary font-heading text-lg font-bold">{item.step}</span>
+                  </div>
+                  <h3 className="font-heading text-xl mb-2 text-foreground">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* STANDARD SIZES */}
       <section className="py-24 border-b border-border">
         <div className="container mx-auto px-4">
@@ -205,8 +303,11 @@ export default function Index() {
             {useCases.map((uc, i) => (
               <AnimatedSection key={uc.title} delay={i * 0.1}>
                 <div className="glass-card overflow-hidden hover-lift group">
-                  {/* Placeholder for real photo */}
-                  <div className="h-48 bg-gradient-to-br from-muted to-card group-hover:scale-105 transition-transform duration-500" />
+                  <OptimizedImage
+                    src={USE_CASE_IMAGES[i]}
+                    alt={uc.title}
+                    className="h-48 w-full group-hover:scale-105 transition-transform duration-500"
+                  />
                   <div className="p-6">
                     <h3 className="font-heading text-2xl mb-2 text-foreground">{uc.title}</h3>
                     <p className="text-sm text-muted-foreground">{uc.desc}</p>
@@ -229,12 +330,11 @@ export default function Index() {
             {projects.map((p, i) => (
               <AnimatedSection key={p.location} delay={i * 0.08}>
                 <div className="relative group overflow-hidden rounded-lg cursor-pointer">
-                  {/* Placeholder for real project photo */}
-                  <div className={`aspect-[4/3] ${
-                    i % 2 === 0
-                      ? "bg-gradient-to-br from-charcoal to-muted"
-                      : "bg-gradient-to-br from-muted to-card"
-                  } group-hover:scale-105 transition-transform duration-500`} />
+                  <OptimizedImage
+                    src={PROJECT_IMAGES[i]}
+                    alt={`${p.location} — ${p.caption}`}
+                    className="aspect-[4/3] w-full group-hover:scale-105 transition-transform duration-500"
+                  />
                   <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center">
                     <span className="text-primary font-medium text-sm">{p.location}</span>
                     <span className="text-muted-foreground text-xs mt-1">{p.caption}</span>
@@ -252,6 +352,34 @@ export default function Index() {
               View All Projects →
             </Link>
           </AnimatedSection>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="py-24 border-b border-border">
+        <div className="container mx-auto px-4">
+          <AnimatedSection className="text-center mb-16">
+            <h2 className="heading-display text-4xl md:text-5xl mb-4">What Our Clients Say</h2>
+          </AnimatedSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {testimonials.map((t, i) => (
+              <AnimatedSection key={t.name} delay={i * 0.1}>
+                <div className="glass-card p-6 hover-lift">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} size={14} className="text-primary fill-primary" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 italic">"{t.quote}"</p>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{t.name}</p>
+                    <p className="text-xs text-muted-foreground">{t.location}</p>
+                  </div>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -286,22 +414,33 @@ export default function Index() {
               </a>
             </div>
 
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="flex gap-2 max-w-md mx-auto"
-            >
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 bg-muted border border-border rounded-md px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-              <button
-                type="submit"
-                className="btn-primary-glow px-6 py-2.5 rounded-md text-sm font-medium"
+            {newsletterSubscribed ? (
+              <div className="flex items-center justify-center gap-2 text-primary">
+                <CheckCircle size={18} />
+                <span className="text-sm font-medium">Thanks for subscribing!</span>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleNewsletterSubmit}
+                className="flex gap-2 max-w-md mx-auto"
               >
-                Subscribe
-              </button>
-            </form>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  required
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  className="flex-1 bg-muted border border-border rounded-md px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <button
+                  type="submit"
+                  disabled={newsletterSending}
+                  className="btn-primary-glow px-6 py-2.5 rounded-md text-sm font-medium disabled:opacity-50"
+                >
+                  {newsletterSending ? "Sending…" : "Subscribe"}
+                </button>
+              </form>
+            )}
           </AnimatedSection>
         </div>
       </section>

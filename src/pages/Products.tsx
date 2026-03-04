@@ -1,6 +1,9 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Check, ArrowRight } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
+import OptimizedImage from "@/components/OptimizedImage";
+import { IMAGES } from "@/lib/images";
 
 const specs = [
   "Aluminum Alloy 6063-T5",
@@ -11,18 +14,29 @@ const specs = [
   "Button-controlled louvers",
 ];
 
+const skyvueSpecs = [
+  "Aluminum Alloy 6063-T5",
+  "Powder-coated finish",
+  "Integrated LED lighting",
+  "Stainless Steel 304 hardware",
+  "Self-drainage system",
+  "Fixed polycarbonate panels",
+];
+
 const products = [
   {
     name: "Greece White",
-    swatch: "#F0EDE8",
+    image: IMAGES.productWhite,
     desc: "A clean, modern white finish that brings brightness and elegance to any outdoor space.",
     colorParam: "white",
+    specs,
   },
   {
     name: "Anthracite Grey",
-    swatch: "#3D3D3D",
+    image: IMAGES.productGrey,
     desc: "A bold, architectural dark finish that makes a statement of refined sophistication.",
     colorParam: "grey",
+    specs,
   },
 ];
 
@@ -35,9 +49,24 @@ const comparison = [
   { feature: "Max Span", single: "4m", double: "6m" },
 ];
 
+const included = [
+  "Complete aluminum frame & roof system",
+  "Integrated LED light strips",
+  "Motorized louver control (PRGLA) or fixed polycarbonate panels (SkyVue)",
+  "Stainless steel 304 hardware kit",
+  "Self-drainage gutter system",
+  "Professional installation",
+  "5-year structural warranty",
+];
+
 export default function Products() {
+  useEffect(() => {
+    document.title = "Products — PRGLA Pergolas";
+  }, []);
+
   return (
     <div className="pt-20">
+      {/* PRGLA LOUVERED */}
       <section className="py-24 border-b border-border">
         <div className="container mx-auto px-4">
           <AnimatedSection className="text-center mb-16">
@@ -51,22 +80,17 @@ export default function Products() {
             {products.map((p, i) => (
               <AnimatedSection key={p.name} delay={i * 0.15}>
                 <div className="glass-card overflow-hidden hover-lift">
-                  <div
-                    className="h-48"
-                    style={{ backgroundColor: p.swatch }}
+                  <OptimizedImage
+                    src={p.image}
+                    alt={`PRGLA Pergola — ${p.name}`}
+                    className="h-48 w-full"
                   />
                   <div className="p-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span
-                        className="w-5 h-5 rounded-full border border-border"
-                        style={{ backgroundColor: p.swatch }}
-                      />
-                      <h3 className="font-heading text-2xl text-foreground">{p.name}</h3>
-                    </div>
+                    <h3 className="font-heading text-2xl text-foreground mb-3">{p.name}</h3>
                     <p className="text-sm text-muted-foreground mb-6">{p.desc}</p>
 
                     <ul className="space-y-2 mb-6">
-                      {specs.map((s) => (
+                      {p.specs.map((s) => (
                         <li key={s} className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Check size={14} className="text-primary flex-shrink-0" />
                           {s}
@@ -88,6 +112,115 @@ export default function Products() {
                 </div>
               </AnimatedSection>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SKYVUE POLYCARBONATE */}
+      <section className="py-24 border-b border-border">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <AnimatedSection className="text-center mb-12">
+            <h2 className="heading-display text-3xl md:text-4xl mb-4">SkyVue Polycarbonate</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Fixed clear or tinted panels for a bright, weather-protected roof. Perfect for year-round outdoor living.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection>
+            <div className="glass-card p-6 md:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="font-heading text-xl mb-4 text-foreground">Features</h3>
+                  <ul className="space-y-2">
+                    {skyvueSpecs.map((s) => (
+                      <li key={s} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Check size={14} className="text-primary flex-shrink-0" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-6">
+                    <Link
+                      to="/configurator?model=skyvue"
+                      className="btn-primary-glow inline-flex items-center gap-2 px-6 py-2.5 rounded-md text-sm font-medium"
+                    >
+                      Configure SkyVue <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="glass-card p-4">
+                    <h4 className="text-sm font-medium text-foreground mb-1">Clear Panels</h4>
+                    <p className="text-xs text-muted-foreground">Maximum light transmission while blocking rain, snow, and UV.</p>
+                  </div>
+                  <div className="glass-card p-4">
+                    <h4 className="text-sm font-medium text-foreground mb-1">Smoke Tinted</h4>
+                    <p className="text-xs text-muted-foreground">Reduced glare with a modern aesthetic and UV protection.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* WHAT'S INCLUDED */}
+      <section className="py-24 border-b border-border">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <AnimatedSection className="text-center mb-12">
+            <h2 className="heading-display text-3xl md:text-4xl mb-4">What's Included</h2>
+            <p className="text-muted-foreground">Every PRGLA pergola comes complete — no hidden costs.</p>
+          </AnimatedSection>
+
+          <AnimatedSection>
+            <div className="glass-card p-6 md:p-8">
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {included.map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <Check size={14} className="text-primary flex-shrink-0 mt-0.5" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* MATERIAL DETAILS */}
+      <section className="py-24 border-b border-border">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <AnimatedSection className="text-center mb-12">
+            <h2 className="heading-display text-3xl md:text-4xl mb-4">Material Details</h2>
+          </AnimatedSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AnimatedSection delay={0}>
+              <div className="glass-card overflow-hidden hover-lift">
+                <OptimizedImage
+                  src={IMAGES.detailAluminum}
+                  alt="Aviation-grade aluminum detail"
+                  className="h-48 w-full"
+                />
+                <div className="p-4">
+                  <h3 className="font-heading text-lg text-foreground mb-1">Aviation-Grade Aluminum</h3>
+                  <p className="text-xs text-muted-foreground">6063-T5 alloy with powder-coated finish for maximum durability.</p>
+                </div>
+              </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.15}>
+              <div className="glass-card overflow-hidden hover-lift">
+                <OptimizedImage
+                  src={IMAGES.detailLED}
+                  alt="Integrated LED lighting detail"
+                  className="h-48 w-full"
+                />
+                <div className="p-4">
+                  <h3 className="font-heading text-lg text-foreground mb-1">Integrated LED Lighting</h3>
+                  <p className="text-xs text-muted-foreground">Weatherproof LED strips built into the beam undersides.</p>
+                </div>
+              </div>
+            </AnimatedSection>
           </div>
         </div>
       </section>

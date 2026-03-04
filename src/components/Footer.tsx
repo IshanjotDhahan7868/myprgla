@@ -1,9 +1,54 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, Facebook, Instagram, MapPin } from "lucide-react";
+import { Phone, Mail, Facebook, Instagram, MapPin, ArrowRight, CheckCircle } from "lucide-react";
+import { sendEmail } from "@/lib/emailjs";
+import { toast } from "sonner";
 
 export default function Footer() {
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleNewsletter = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSending(true);
+    try {
+      await sendEmail("newsletter", { email });
+      setSubscribed(true);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <footer className="border-t border-border bg-card">
+      {/* Free Consultation CTA */}
+      <div className="border-b border-border">
+        <div className="container mx-auto px-4 lg:px-8 py-12 text-center">
+          <h3 className="font-heading text-2xl md:text-3xl mb-3 text-foreground">Ready to Transform Your Outdoor Space?</h3>
+          <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+            Get a free consultation and custom quote for your pergola project.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/quote"
+              className="btn-primary-glow px-6 py-2.5 rounded-md text-sm font-medium inline-flex items-center justify-center gap-2"
+            >
+              Free Consultation <ArrowRight size={14} />
+            </Link>
+            <a
+              href="tel:6476486383"
+              className="px-6 py-2.5 rounded-md text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <Phone size={14} /> 647-648-6383
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="md:col-span-2">
@@ -14,6 +59,35 @@ export default function Footer() {
               Premium aviation-grade aluminum pergolas with smart louvered roofs,
               built-in LED lighting, and Canadian craftsmanship.
             </p>
+
+            {/* Newsletter in footer */}
+            <div className="mt-6">
+              {subscribed ? (
+                <div className="flex items-center gap-2 text-primary text-sm">
+                  <CheckCircle size={16} />
+                  <span>Thanks for subscribing!</span>
+                </div>
+              ) : (
+                <form onSubmit={handleNewsletter} className="flex gap-2 max-w-sm">
+                  <input
+                    type="email"
+                    required
+                    placeholder="Your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="flex-1 bg-muted border border-border rounded-md px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <button
+                    type="submit"
+                    disabled={sending}
+                    className="btn-primary-glow px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
+                  >
+                    {sending ? "…" : "Subscribe"}
+                  </button>
+                </form>
+              )}
+            </div>
+
             <div className="flex gap-4 mt-6">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
                 <Facebook size={20} />

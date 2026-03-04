@@ -63,11 +63,19 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-            <Phone size={14} />
-            <a href="tel:6476486383" className="hover:text-foreground transition-colors">
-              647-648-6383
-            </a>
+          <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Phone size={14} />
+              <a href="tel:6476486383" className="hover:text-foreground transition-colors">
+                647-648-6383
+              </a>
+            </div>
+            <Link
+              to="/quote"
+              className="btn-primary-glow px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Free Quote
+            </Link>
           </div>
 
           <button

@@ -1,6 +1,6 @@
-import { useMemo, useRef, useEffect } from "react";
+import { Suspense, useMemo, useRef, useEffect, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Environment, Sky } from "@react-three/drei";
+import { OrbitControls, Environment, Sky, useProgress, Html } from "@react-three/drei";
 import * as THREE from "three";
 
 export type SceneMode = "studio" | "outdoor";
@@ -29,9 +29,27 @@ const POST_HEIGHT = 2.5;
 const POST_SIZE = 0.1;
 const BEAM_HEIGHT = 0.08;
 const BEAM_WIDTH = 0.06;
-const FRAME_INSET = POST_SIZE + 0.02; // inner offset from posts/beams
+const FRAME_INSET = POST_SIZE + 0.02;
 const LOUVER_THICKNESS = 0.015;
 const WALL_HEIGHT = 2.2;
+const LED_COLOR = "#FFE4B5";
+
+function Loader() {
+  const { progress } = useProgress();
+  return (
+    <Html center>
+      <div className="flex flex-col items-center gap-2">
+        <div className="w-32 h-1.5 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <span className="text-xs text-muted-foreground">{Math.round(progress)}%</span>
+      </div>
+    </Html>
+  );
+}
 
 function PergolaModel({
   color,
@@ -47,7 +65,6 @@ function PergolaModel({
   const halfW = width / 2;
   const halfD = depth / 2;
 
-  // Inner span based on actual frame dimensions (posts + beams)
   const innerWidth = Math.max(0.2, width - 2 * FRAME_INSET);
   const innerDepth = Math.max(0.2, depth - 2 * FRAME_INSET);
 
@@ -62,7 +79,7 @@ function PergolaModel({
   }, [innerWidth, louverCount]);
 
   const angleRad = THREE.MathUtils.degToRad(louverAngle);
-  const louverSpanDepth = innerDepth * 0.98; // small inset inside beams
+  const louverSpanDepth = innerDepth * 0.98;
 
   const slatThickness = 0.02;
 
@@ -73,6 +90,94 @@ function PergolaModel({
       metalness={0.4}
     />
   );
+
+  // Dynamic LED lights distributed along beams
+  const ledLights = useMemo(() => {
+    if (!ledsOn) return null;
+
+    const lights: JSX.Element[] = [];
+    const ledY = POST_HEIGHT - 0.12;
+
+    // LEDs along width beams (front and back)
+    const wCount = Math.max(2, Math.ceil(width / 1.5));
+    for (let side = -1; side <= 1; side += 2) {
+      const z = side * (halfD - BEAM_WIDTH / 2);
+      for (let i = 0; i < wCount; i++) {
+        const x = -halfW + (i + 0.5) * (width / wCount);
+        lights.push(
+          <pointLight
+            key={`led-w-${side}-${i}`}
+            position={[x, ledY, z]}
+            color={LED_COLOR}
+            intensity={0.8}
+            distance={3}
+          />
+        );
+      }
+    }
+
+    // LEDs along depth beams (left and right)
+    const dCount = Math.max(2, Math.ceil(depth / 1.5));
+    for (let side = -1; side <= 1; side += 2) {
+      const x = side * (halfW - BEAM_WIDTH / 2);
+      for (let i = 0; i < dCount; i++) {
+        const z = -halfD + (i + 0.5) * (depth / dCount);
+        lights.push(
+          <pointLight
+            key={`led-d-${side}-${i}`}
+            position={[x, ledY, z]}
+            color={LED_COLOR}
+            intensity={0.8}
+            distance={3}
+          />
+        );
+      }
+    }
+
+    return lights;
+  }, [ledsOn, width, depth, halfW, halfD]);
+
+  // Visible LED strip meshes along beam undersides
+  const ledStrips = useMemo(() => {
+    if (!ledsOn) return null;
+
+    const strips: JSX.Element[] = [];
+    const stripY = POST_HEIGHT - 0.06;
+    const stripH = 0.015;
+    const stripW = 0.02;
+
+    // Along width beams
+    for (let side = -1; side <= 1; side += 2) {
+      const z = side * (halfD - BEAM_WIDTH / 2);
+      strips.push(
+        <mesh key={`strip-w-${side}`} position={[0, stripY, z]}>
+          <boxGeometry args={[width * 0.9, stripH, stripW]} />
+          <meshStandardMaterial
+            color={LED_COLOR}
+            emissive={LED_COLOR}
+            emissiveIntensity={2}
+          />
+        </mesh>
+      );
+    }
+
+    // Along depth beams
+    for (let side = -1; side <= 1; side += 2) {
+      const x = side * (halfW - BEAM_WIDTH / 2);
+      strips.push(
+        <mesh key={`strip-d-${side}`} position={[x, stripY, 0]}>
+          <boxGeometry args={[stripW, stripH, depth * 0.9]} />
+          <meshStandardMaterial
+            color={LED_COLOR}
+            emissive={LED_COLOR}
+            emissiveIntensity={2}
+          />
+        </mesh>
+      );
+    }
+
+    return strips;
+  }, [ledsOn, width, depth, halfW, halfD]);
 
   const renderSideWall = () => {
     if (sideWall === "off") return null;
@@ -101,7 +206,6 @@ function PergolaModel({
       return slats;
     }
 
-    // Back wall
     if (sideWall === "back") {
       const wallZ = halfD - FRAME_INSET;
       const count = Math.max(4, Math.floor(innerWidth / 0.18));
@@ -246,29 +350,9 @@ function PergolaModel({
       {/* Side wall slats */}
       {renderSideWall()}
 
-      {/* LED lights */}
-      {ledsOn && (
-        <>
-          <pointLight
-            position={[0, POST_HEIGHT - 0.15, 0]}
-            color="#FFB347"
-            intensity={2}
-            distance={4}
-          />
-          <pointLight
-            position={[-0.25, POST_HEIGHT - 0.15, 0]}
-            color="#FFB347"
-            intensity={1}
-            distance={3}
-          />
-          <pointLight
-            position={[0.25, POST_HEIGHT - 0.15, 0]}
-            color="#FFB347"
-            intensity={1}
-            distance={3}
-          />
-        </>
-      )}
+      {/* LED lights + visible strips */}
+      {ledLights}
+      {ledStrips}
     </group>
   );
 }
@@ -289,20 +373,22 @@ function OutdoorGround() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
       <planeGeometry args={[40, 40]} />
-      <meshStandardMaterial color="#DADFE7" roughness={0.8} />
+      <meshStandardMaterial color="#C5B9A8" roughness={0.85} />
     </mesh>
   );
 }
 
 function SceneContents({ view = "corner", sceneMode = "studio", ...props }: SceneProps) {
   const controlsRef = useRef<any>(null);
-  const { camera } = useThree();
+  const { camera, invalidate } = useThree();
+  const isAnimating = useRef(false);
 
   const targetCamera = useRef(new THREE.Vector3(9, 6, 9));
   const targetLookAt = useRef(new THREE.Vector3(0, 1.4, 0));
 
-  // Update desired camera + target for smooth transitions when view changes
+  // When view changes, start animating
   useEffect(() => {
+    isAnimating.current = true;
     switch (view) {
       case "front":
         targetCamera.current.set(0, 4.2, 10);
@@ -322,20 +408,37 @@ function SceneContents({ view = "corner", sceneMode = "studio", ...props }: Scen
         targetLookAt.current.set(0, 1.4, 0);
         break;
     }
-  }, [view]);
+    invalidate();
+  }, [view, invalidate]);
 
-  // Smooth camera + controls target interpolation
+  // Invalidate on prop changes so demand rendering works
+  const invalidateOnChange = useCallback(() => {
+    invalidate();
+  }, [invalidate]);
+
+  useEffect(() => {
+    invalidateOnChange();
+  }, [props.color, props.width, props.depth, props.louverAngle, props.ledsOn, props.modelType, props.sideWall, props.roofTint, sceneMode, invalidateOnChange]);
+
+  // Only lerp camera when animating; stop when converged
   useFrame(() => {
+    if (!isAnimating.current) return;
+
     camera.position.lerp(targetCamera.current, 0.08);
     if (controlsRef.current) {
       controlsRef.current.target.lerp(targetLookAt.current, 0.1);
       controlsRef.current.update();
     }
+
+    const dist = camera.position.distanceTo(targetCamera.current);
+    if (dist < 0.05) {
+      isAnimating.current = false;
+    }
+    invalidate();
   });
 
   return (
     <>
-      {/* Background / environment */}
       {sceneMode === "studio" ? (
         <>
           <color attach="background" args={["#050608"]} />
@@ -345,13 +448,16 @@ function SceneContents({ view = "corner", sceneMode = "studio", ...props }: Scen
             intensity={1.05}
             castShadow
             shadow-mapSize={[2048, 2048]}
+            shadow-camera-left={-8}
+            shadow-camera-right={8}
+            shadow-camera-top={8}
+            shadow-camera-bottom={-8}
           />
           <StudioGround />
           <Environment preset="night" />
         </>
       ) : (
         <>
-          {/* Outdoor / live look */}
           <color attach="background" args={["#E6EEF7"]} />
           <Sky sunPosition={[12, 14, 8]} inclination={0.45} azimuth={0.25} />
           <ambientLight intensity={0.6} />
@@ -360,6 +466,10 @@ function SceneContents({ view = "corner", sceneMode = "studio", ...props }: Scen
             intensity={1.35}
             castShadow
             shadow-mapSize={[2048, 2048]}
+            shadow-camera-left={-8}
+            shadow-camera-right={8}
+            shadow-camera-top={8}
+            shadow-camera-bottom={-8}
           />
           <OutdoorGround />
           <Environment preset="city" />
@@ -377,6 +487,7 @@ function SceneContents({ view = "corner", sceneMode = "studio", ...props }: Scen
         maxPolarAngle={Math.PI / 2.05}
         enablePan
         target={[0, 1.4, 0]}
+        onChange={() => invalidate()}
       />
     </>
   );
@@ -388,9 +499,12 @@ export default function PergolaScene(props: SceneProps) {
   return (
     <Canvas
       shadows
+      frameloop="demand"
       camera={{ position: [9, 6, 9], fov: 42 }}
     >
-      <SceneContents {...props} sceneMode={sceneMode} />
+      <Suspense fallback={<Loader />}>
+        <SceneContents {...props} sceneMode={sceneMode} />
+      </Suspense>
     </Canvas>
   );
 }
