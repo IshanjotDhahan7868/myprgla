@@ -115,7 +115,7 @@ export default function Index() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${IMAGES.heroAlt})` }}
+          style={{ backgroundImage: `url(${IMAGES.hero})` }}
         />
         <div className="absolute inset-0 bg-background/70" />
 
