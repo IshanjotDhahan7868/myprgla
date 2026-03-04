@@ -17,7 +17,9 @@ export default function FAQs() {
   const [open, setOpen] = useState<number | null>(null);
 
   useEffect(() => {
-    document.title = "FAQ — PRGLA Pergolas";
+    document.title = "Pergola FAQ — Pricing, Installation & Warranty | PRGLA";
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", "Answers to common questions about PRGLA aluminum pergolas — sizes, pricing, installation timeline, weatherproofing, warranty, and shipping across Canada.");
   }, []);
 
   return (

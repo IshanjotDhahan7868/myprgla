@@ -13,7 +13,9 @@ export default function QuotePage() {
   });
 
   useEffect(() => {
-    document.title = "Get a Quote — PRGLA Pergolas";
+    document.title = "Get a Free Pergola Quote — PRGLA | Toronto & GTA";
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", "Get a free detailed quote for your premium aluminum pergola within 48 hours. Serving Toronto, Oakville, Vaughan, Caledon, and the Greater Toronto Area.");
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

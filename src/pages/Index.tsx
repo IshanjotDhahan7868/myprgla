@@ -88,10 +88,10 @@ export default function Index() {
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
   useEffect(() => {
-    document.title = "PRGLA — Premium Aluminum Pergolas | Toronto & GTA";
+    document.title = "PRGLA — Premium Aluminum Pergolas | Toronto & GTA | Louvered Roofs";
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
-      meta.setAttribute("content", "Aviation-grade aluminum pergolas with smart louvered roofs, LED lighting, and Canadian craftsmanship. Serving the Greater Toronto Area.");
+      meta.setAttribute("content", "PRGLA builds premium aviation-grade aluminum pergolas with motorized louvered roofs, built-in LED lighting, and 5-year warranty. Serving Toronto, Oakville, Vaughan, Caledon & the GTA. Installed in days.");
     }
   }, []);
 

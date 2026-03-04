@@ -61,7 +61,9 @@ const included = [
 
 export default function Products() {
   useEffect(() => {
-    document.title = "Products — PRGLA Pergolas";
+    document.title = "Aluminum Pergolas — Louvered & Polycarbonate | PRGLA Products";
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", "Explore PRGLA's premium aluminum pergolas — motorized louvered roofs and SkyVue polycarbonate models in Greece White and Anthracite Grey. 5-year warranty, professional installation in the GTA.");
   }, []);
 
   return (

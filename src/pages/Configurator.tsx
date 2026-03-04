@@ -69,7 +69,9 @@ export default function Configurator() {
   const currentSize = sizeOptions[sizeIdx];
 
   useEffect(() => {
-    document.title = "3D Configurator — PRGLA Pergolas";
+    document.title = "3D Pergola Configurator — Design Your PRGLA Pergola";
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", "Design your dream aluminum pergola in 3D. Choose size, color, louver style, LED lighting, and side walls. Get an instant quote for your GTA home.");
   }, []);
 
   const configSummary = `${currentColor.label}, ${currentSize.label}, ${

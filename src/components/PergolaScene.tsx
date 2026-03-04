@@ -30,7 +30,7 @@ const POST_SIZE = 0.1;
 const BEAM_HEIGHT = 0.08;
 const BEAM_WIDTH = 0.06;
 const FRAME_INSET = POST_SIZE + 0.02;
-const LOUVER_THICKNESS = 0.015;
+const LOUVER_THICKNESS = 0.008;
 const WALL_HEIGHT = 2.2;
 const LED_COLOR = "#FFE4B5";
 
@@ -324,17 +324,17 @@ function PergolaModel({
         </mesh>
       ))}
 
-      {/* Louvered roof */}
+      {/* Louvered roof — blades rotate around their Z (span) axis like venetian blinds */}
       {modelType === "louvered" &&
         louvers.map((x, i) => (
           <mesh
             key={`louver-${i}`}
             position={[x, POST_HEIGHT - 0.05, 0]}
-            rotation={[angleRad, 0, 0]}
+            rotation={[0, 0, angleRad]}
             castShadow
           >
             <boxGeometry
-              args={[(innerWidth / louverCount) * 0.9, LOUVER_THICKNESS, louverSpanDepth]}
+              args={[(innerWidth / louverCount) * 0.92, LOUVER_THICKNESS, louverSpanDepth]}
             />
             <meshStandardMaterial
               color={materialColor}

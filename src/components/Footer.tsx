@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, Facebook, Instagram, MapPin, ArrowRight, CheckCircle } from "lucide-react";
+import { Phone, Mail, Facebook, Instagram, MapPin, ArrowRight, CheckCircle, Check } from "lucide-react";
 import { sendEmail } from "@/lib/emailjs";
 import { toast } from "sonner";
 
@@ -8,6 +8,12 @@ export default function Footer() {
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+
+  // Consultation form state
+  const [showConsultForm, setShowConsultForm] = useState(false);
+  const [consultForm, setConsultForm] = useState({ name: "", email: "", phone: "" });
+  const [consultSending, setConsultSending] = useState(false);
+  const [consultSent, setConsultSent] = useState(false);
 
   const handleNewsletter = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +29,26 @@ export default function Footer() {
     }
   };
 
+  const handleConsultSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setConsultSending(true);
+    try {
+      await sendEmail("quote", {
+        name: consultForm.name,
+        email: consultForm.email,
+        phone: consultForm.phone,
+        notes: "Free consultation request from footer",
+        size: "",
+        color: "",
+      });
+      setConsultSent(true);
+    } catch {
+      toast.error("Something went wrong. Please try again or call us directly.");
+    } finally {
+      setConsultSending(false);
+    }
+  };
+
   return (
     <footer className="border-t border-border bg-card">
       {/* Free Consultation CTA */}
@@ -32,20 +58,70 @@ export default function Footer() {
           <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
             Free design consultation. Quote in 48 hours. Installed in days. What are you waiting for?
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              to="/quote"
-              className="btn-primary-glow px-6 py-2.5 rounded-md text-sm font-medium inline-flex items-center justify-center gap-2"
-            >
-              Free Consultation <ArrowRight size={14} />
-            </Link>
-            <a
-              href="tel:6476486383"
-              className="px-6 py-2.5 rounded-md text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors inline-flex items-center justify-center gap-2"
-            >
-              <Phone size={14} /> 647-648-6383
-            </a>
-          </div>
+
+          {consultSent ? (
+            <div className="flex items-center justify-center gap-2 text-primary">
+              <Check size={20} />
+              <span className="text-sm font-medium">We'll be in touch within 24 hours!</span>
+            </div>
+          ) : showConsultForm ? (
+            <form onSubmit={handleConsultSubmit} className="max-w-sm mx-auto space-y-3">
+              <input
+                placeholder="Your name"
+                required
+                value={consultForm.name}
+                onChange={(e) => setConsultForm({ ...consultForm, name: e.target.value })}
+                className="w-full bg-muted border border-border rounded-md px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              <input
+                placeholder="Email address"
+                type="email"
+                required
+                value={consultForm.email}
+                onChange={(e) => setConsultForm({ ...consultForm, email: e.target.value })}
+                className="w-full bg-muted border border-border rounded-md px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              <input
+                placeholder="Phone number"
+                type="tel"
+                required
+                value={consultForm.phone}
+                onChange={(e) => setConsultForm({ ...consultForm, phone: e.target.value })}
+                className="w-full bg-muted border border-border rounded-md px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  disabled={consultSending}
+                  className="btn-primary-glow flex-1 px-6 py-3 rounded-md text-sm font-medium disabled:opacity-50"
+                >
+                  {consultSending ? "Sending…" : "Get My Free Consultation"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowConsultForm(false)}
+                  className="px-4 py-3 rounded-md text-sm border border-border text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => setShowConsultForm(true)}
+                className="btn-primary-glow px-6 py-2.5 rounded-md text-sm font-medium inline-flex items-center justify-center gap-2"
+              >
+                Free Consultation <ArrowRight size={14} />
+              </button>
+              <a
+                href="tel:6476486383"
+                className="px-6 py-2.5 rounded-md text-sm font-medium border border-border text-foreground hover:bg-muted transition-colors inline-flex items-center justify-center gap-2"
+              >
+                <Phone size={14} /> 647-648-6383
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
