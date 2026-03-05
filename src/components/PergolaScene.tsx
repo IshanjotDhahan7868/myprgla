@@ -29,9 +29,9 @@ interface SceneProps extends PergolaProps {
 }
 
 const POST_HEIGHT = 2.5;
-const POST_SIZE = 0.18;
-const BEAM_HEIGHT = 0.18;
-const BEAM_WIDTH = 0.16;
+const POST_SIZE = 0.16;
+const BEAM_HEIGHT = 0.16;
+const BEAM_WIDTH = 0.14;
 const FRAME_INSET = POST_SIZE + 0.02;
 const LOUVER_THICKNESS = 0.008;
 const WALL_HEIGHT = 2.2;
